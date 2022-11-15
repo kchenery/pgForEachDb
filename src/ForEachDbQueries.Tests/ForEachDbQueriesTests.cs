@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Dapper;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -22,9 +25,17 @@ public class ForEachDbQueriesTests
         
         // Act
         var query = dbFinder.Query();
-        
+        var parameters = (DynamicParameters) query.Parameters;
+        var paramDatabases = new List<string>();
+        foreach (var paramName in parameters.ParameterNames)
+        {
+            paramDatabases.Add(parameters.Get<dynamic>(paramName));
+        }
+
         // Assert
         query.RawSql.Trim().Should().Match(expectedSql);
+        query.Parameters.AsDynamicParameters().ValueList().Where(p => p is string).Should().Contain("foo");
+        query.Parameters.AsDynamicParameters().ValueList().Where(p => p is string).Should().Contain("bar");
     }
 
     [Test]
@@ -47,7 +58,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithIgnorePostgresDb_ShouldFilterOutPostgresDb()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @postgres AND datallowconn = true";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datallowconn = true";
         
         var dbFinder = new DatabaseFinder();
         dbFinder.IgnorePostgresDb();

@@ -15,13 +15,7 @@ public class DatabaseFinder : IDatabaseFinder
         _sqlBuilder.Where("datistemplate = false");
         return this;
     }
-
-    public IDatabaseFinder IgnorePostgresDb()
-    {
-        _sqlBuilder.Where("datname != @postgres", new { postgres = "postgres" });
-        return this;
-    }
-
+    
     public IDatabaseFinder IgnoreDatabase(string database)
     {
         _dbNameCount++;
@@ -33,6 +27,8 @@ public class DatabaseFinder : IDatabaseFinder
         _sqlBuilder.Where($"datname != {paramName}", param);
         return this;
     }
+    
+    public IDatabaseFinder IgnorePostgresDb() => IgnoreDatabase("postgres");
 
     public IDatabaseFinder OrderByName(bool ascending = true)
     {
