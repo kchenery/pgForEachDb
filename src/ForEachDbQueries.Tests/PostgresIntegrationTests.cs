@@ -13,22 +13,22 @@ namespace ForEachDbQueries.Tests;
 public class PostgresIntegrationTests
 {
     private NpgsqlConnection? _pgConn;
-    private PostgreSqlTestcontainer _postgresqlContainer;
+    private readonly PostgreSqlTestcontainer _postgresqlContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
+        .WithDatabase(new PostgreSqlTestcontainerConfiguration
+        {
+            Database = "ignored",
+            Username = "postgres",
+            Password = "postgres",
+            Port = 54321
+        })
+        .Build();
 
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
-        _postgresqlContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-            .WithDatabase(new PostgreSqlTestcontainerConfiguration
-            {
-                Database = "ignored",
-                Username = "postgres",
-                Password = "postgres",
-                Port = 54321
-            })
-            .Build();
-        
         await _postgresqlContainer.StartAsync();
+        _pgConn = new NpgsqlConnection(_postgresqlContainer.ConnectionString);
+
     }
 
     [OneTimeTearDown]
@@ -40,7 +40,6 @@ public class PostgresIntegrationTests
     [SetUp]
     public void Setup()
     {
-        _pgConn = new NpgsqlConnection(_postgresqlContainer.ConnectionString);
     }
 
     [Test]
