@@ -14,7 +14,7 @@ public class Options
     [Option('u', "username", HelpText = "Username for the connection", Default = "postgres")]
     public string? Username { get; set; } 
     
-    [Option('p', "password", HelpText = "Password for the connection")]
+    [Option('p', "password", Required = true, HelpText = "Password for the connection")]
     public string? Password { get; set; }
     
     [Option("port", HelpText = "Password for the connection", Default = 5432)]
@@ -22,13 +22,4 @@ public class Options
 
     [Option('q', "query", Required = true, HelpText = "Query to run against each database")]
     public string? Query { get; set; }
-    
-    [Option("ignore", HelpText = "List of databases that should be ignored")]
-    public IEnumerable<string>? IgnoreDatabases { get; set; }
-    
-    [Option("include-postgres-db", HelpText = "Flag to include the postgres database")]
-    public bool IncludePostgresDb { get; set; }
-    
-    [Option("include-template-db", HelpText = "Flag to include the postgres database")]
-    public bool IncludeTemplateDb { get; set; }
 }
