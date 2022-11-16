@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForEachDbQueries", "src\For
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForEachDbQueries.Tests", "src\ForEachDbQueries.Tests\ForEachDbQueries.Tests.csproj", "{7EB2095B-9A75-4C9F-84C4-E8AE5845A174}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForEachDb", "src\ForEachDb\ForEachDb.csproj", "{21DC97AD-D5BA-478D-91D0-F599D0962AF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{7EB2095B-9A75-4C9F-84C4-E8AE5845A174}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EB2095B-9A75-4C9F-84C4-E8AE5845A174}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EB2095B-9A75-4C9F-84C4-E8AE5845A174}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21DC97AD-D5BA-478D-91D0-F599D0962AF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21DC97AD-D5BA-478D-91D0-F599D0962AF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21DC97AD-D5BA-478D-91D0-F599D0962AF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21DC97AD-D5BA-478D-91D0-F599D0962AF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
