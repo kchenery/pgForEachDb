@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CommandLine;
 using Dapper;
 using ForEachDb;
@@ -45,18 +44,20 @@ Parser.Default.ParseArguments<Options>(args)
         connectionString = csBuilder.ToString();
     });
 
-if (connectionString != "")
+// Find databases and run query against them
+if (!string.IsNullOrEmpty(connectionString))
 {
     var connection = new NpgsqlConnection(connectionString);
     
-    Console.WriteLine("Finding databases...");
-    var dbFinder = new DatabaseFinder()
-        .IgnorePostgresDb()
-        .IgnoreTemplateDb()
-        .Query();
+    var databases = (await connection.QueryAsync<string>(dbFinder.Query().RawSql, dbFinder.Query().Parameters)).Order().ToList();
 
-    var databases = (await connection.QueryAsync<string>(dbFinder.RawSql, dbFinder.Parameters)).ToList().Order();
-
-    var forEachDb = new ForEachDbRunner(connectionString, null);
-    await forEachDb.RunQueryAsync(databases, query);
+    if (databases.Any())
+    {
+        var forEachDb = new ForEachDbRunner(connectionString, null);
+        await forEachDb.RunQueryAsync(databases, query);
+    }
+    else
+    {
+        Console.WriteLine("No databases found to run query against");
+    }
 }
