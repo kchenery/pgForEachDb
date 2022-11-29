@@ -17,7 +17,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithMultipleIgnoreDatabases_ShouldParameteriseIndividually()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datname != @database2 AND datallowconn = true";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datname != @database2 AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder()
             .IgnoreDatabase("foo")
@@ -42,7 +42,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithIgnoreTemplateDatabases_ShouldFilterOutTemplateDatabases()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder()
             .IgnoreTemplateDb();
@@ -58,7 +58,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithIgnorePostgresDb_ShouldFilterOutPostgresDb()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datallowconn = true";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder();
         dbFinder.IgnorePostgresDb();
@@ -69,5 +69,24 @@ public class ForEachDbQueriesTests
         // Assert
         query.RawSql.Trim().Should().Match(expectedSql);
         
+    }
+
+    [Test]
+    [TestCase(true, "SELECT datname FROM pg_database WHERE datallowconn = true")]
+    [TestCase(false, "SELECT datname FROM pg_database WHERE datallowconn = true AND datname NOT LIKE 'rdsadmin'")]
+    public void ForEachDbQuery_WithIncludeRdsAdmin_ShouldNotFilterOutRdsAdmin(bool includeRdsAdmin, string expectedSql)
+    {
+        // Arrange
+        var dbFinder = new DatabaseFinder();
+        if (includeRdsAdmin)
+        {
+            dbFinder.IncludeRdsAdmin();
+        }
+        
+        // Act
+        var query = dbFinder.Query();
+        
+        // Assert
+        query.RawSql.Trim().Should().Be(expectedSql);
     }
 }
