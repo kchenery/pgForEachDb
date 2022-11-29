@@ -6,7 +6,8 @@ public class DatabaseFinder : IDatabaseFinder
 {
     private readonly SqlBuilder _sqlBuilder = new();
     private readonly string _queryTemplate = "SELECT datname FROM pg_database /**where**/ /**orderby**/";
-    private bool _ignoreUnconnectableDbs = true; 
+    private bool _ignoreUnconnectableDbs = true;
+    private bool _ignoreRdsAdmin = true;
 
     private int _dbNameCount = 0;
 
@@ -42,11 +43,22 @@ public class DatabaseFinder : IDatabaseFinder
         return this;
     }
 
+    public IDatabaseFinder IncludeRdsAdmin()
+    {
+        _ignoreRdsAdmin = false;
+        return this;
+    }
+
     public SqlBuilder.Template Query()
     {
         if (_ignoreUnconnectableDbs)
         {
             _sqlBuilder.Where("datallowconn = true");
+        }
+
+        if (_ignoreRdsAdmin)
+        {
+            _sqlBuilder.Where("datname NOT LIKE 'rdsadmin'");
         }
         
         return _sqlBuilder.AddTemplate(_queryTemplate);
