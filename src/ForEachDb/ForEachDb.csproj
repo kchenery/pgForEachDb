@@ -9,7 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.9.1" />
-      <PackageReference Include="Npgsql" Version="7.0.0" />
+      <PackageReference Include="Npgsql" Version="7.0.1" />
       <PackageReference Include="ReadLine" Version="2.0.1" />
     </ItemGroup>
 
