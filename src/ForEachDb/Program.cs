@@ -24,7 +24,7 @@ Parser.Default.ParseArguments<Options>(args)
         
         if (options.Query is not null) query = options.Query;
         if (options.IgnoreDatabases is not null) ignoreDatabases.AddRange(options.IgnoreDatabases);
-        if (options.IncludePostgresDb) dbFinder.IgnorePostgresDb();
+        if (!options.IncludePostgresDb) dbFinder.IgnorePostgresDb();
         if (!options.IncludeTemplateDb) dbFinder.IgnoreTemplateDb();
         
         foreach (var ignoreDb in ignoreDatabases)
