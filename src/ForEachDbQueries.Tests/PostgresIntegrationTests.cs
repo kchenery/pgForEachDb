@@ -1,33 +1,34 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
 using FluentAssertions;
 using Npgsql;
 using NUnit.Framework;
+using Testcontainers.PostgreSql;
 
 namespace ForEachDbQueries.Tests;
 
 public class PostgresIntegrationTests
 {
+    private const string PG_DATABASE = "ignored";
+    private const string PG_USERNAME = "postgres";
+    private const string PG_PASSWORD = "postgres";
+    const int PG_PORT = 54321;
+    
     private NpgsqlConnection? _pgConn;
-    private readonly PostgreSqlTestcontainer _postgresqlContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-        .WithDatabase(new PostgreSqlTestcontainerConfiguration
-        {
-            Database = "ignored",
-            Username = "postgres",
-            Password = "postgres",
-            Port = 54321
-        })
-        .Build();
 
+    private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder()
+        .WithDatabase(PG_DATABASE)
+        .WithUsername(PG_USERNAME)
+        .WithPassword(PG_PASSWORD)
+        .WithPortBinding(PG_PORT)
+        .Build();
+    
     [OneTimeSetUp]
     public async Task OneTimeSetup()
     {
         await _postgresqlContainer.StartAsync();
-        _pgConn = new NpgsqlConnection(_postgresqlContainer.ConnectionString);
+        _pgConn = new NpgsqlConnection(_postgresqlContainer.GetConnectionString());
 
     }
 
