@@ -4,7 +4,7 @@ namespace ForEachDb;
 using CommandLine;
     
 [UsedImplicitly(ImplicitUseTargetFlags.Members)]
-public abstract class Options
+public class Options
 {
     [Option('h', "host", HelpText = "Hostname to connect to.", Default = "localhost")]
     public string? HostName { get; set; }
