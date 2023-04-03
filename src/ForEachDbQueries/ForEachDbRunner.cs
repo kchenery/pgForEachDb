@@ -7,9 +7,9 @@ namespace ForEachDbQueries;
 public class ForEachDbRunner : IForEachDbRunner
 {
     private readonly string _connectionString;
-    private ILogger? _logger;
+    private ILogger _logger;
 
-    public ForEachDbRunner(string connectionString, ILogger? logger = null)
+    public ForEachDbRunner(string connectionString, ILogger logger)
     {
         _connectionString = connectionString;
         _logger = logger;
@@ -38,10 +38,17 @@ public class ForEachDbRunner : IForEachDbRunner
 
         await Parallel.ForEachAsync(databases, options, async (database, token) =>
         {
-            Console.WriteLine($"Running query against: {database}");
+            _logger.LogInformation("Running query against database: {Database}", database);
             var connection = SwitchDatabaseConnection(database);
             await connection.OpenAsync(token);
-            allResults.AddRange(await connection.QueryAsync<TQueryResult>(queryTemplate));
+            var results = (await connection.QueryAsync<TQueryResult>(queryTemplate)).Where(r => r != null).ToArray();
+
+            foreach (var result in results)
+            {
+                _logger.LogInformation("{Message}", result?.ToString());
+            }
+            
+            allResults.AddRange(results);
             await connection.CloseAsync();
         });
 

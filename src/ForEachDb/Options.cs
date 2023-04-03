@@ -1,9 +1,8 @@
-﻿using JetBrains.Annotations;
+﻿using System.Runtime.InteropServices;
 
 namespace ForEachDb;
 using CommandLine;
     
-[UsedImplicitly(ImplicitUseTargetFlags.Members)]
 public class Options
 {
     [Option('h', "host", HelpText = "Hostname to connect to.", Default = "localhost")]
