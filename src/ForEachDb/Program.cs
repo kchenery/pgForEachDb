@@ -2,11 +2,23 @@ using CommandLine;
 using Dapper;
 using ForEachDb;
 using ForEachDbQueries;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 string connectionString = "";
 string query = "";
 List<string> ignoreDatabases = new();
+
+using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
+    .SetMinimumLevel(LogLevel.Trace)
+    .AddSimpleConsole(o =>
+    {
+        o.SingleLine = true;
+        o.TimestampFormat = "HH:mm:ss ";
+        o.IncludeScopes = false;
+    }));
+    
+var logger = loggerFactory.CreateLogger<ForEachDbRunner>();
 
 var dbFinder = new DatabaseFinder();
 
@@ -53,7 +65,7 @@ if (!string.IsNullOrEmpty(connectionString))
 
     if (databases.Any())
     {
-        var forEachDb = new ForEachDbRunner(connectionString, null);
+        var forEachDb = new ForEachDbRunner(connectionString, logger);
         await forEachDb.RunQueryAsync(databases, query);
     }
     else
