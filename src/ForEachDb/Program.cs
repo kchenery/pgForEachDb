@@ -5,19 +5,20 @@ using ForEachDbQueries;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
+const string loggingTimeFormat = "HH:mm:ss | ";
 string connectionString = "";
 string query = "";
 List<string> ignoreDatabases = new();
 
 using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
     .SetMinimumLevel(LogLevel.Trace)
-    .AddSimpleConsole(o =>
+    .AddSimpleConsole(opt =>
     {
-        o.SingleLine = true;
-        o.TimestampFormat = "HH:mm:ss ";
-        o.IncludeScopes = false;
-    }));
-    
+        opt.IncludeScopes = false;
+        opt.TimestampFormat = loggingTimeFormat;
+    })
+);
+
 var logger = loggerFactory.CreateLogger<ForEachDbRunner>();
 
 var dbFinder = new DatabaseFinder();
@@ -36,7 +37,7 @@ Parser.Default.ParseArguments<Options>(args)
         
         if (options.Query is not null) query = options.Query;
         if (options.IgnoreDatabases is not null) ignoreDatabases.AddRange(options.IgnoreDatabases);
-        if (options.IncludePostgresDb) dbFinder.IgnorePostgresDb();
+        if (!options.IncludePostgresDb) dbFinder.IgnorePostgresDb();
         if (!options.IncludeTemplateDb) dbFinder.IgnoreTemplateDb();
         
         foreach (var ignoreDb in ignoreDatabases)
@@ -70,6 +71,6 @@ if (!string.IsNullOrEmpty(connectionString))
     }
     else
     {
-        Console.WriteLine("No databases found to run query against");
+        logger.LogWarning("No databases found to run query against");
     }
 }
