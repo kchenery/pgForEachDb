@@ -1,10 +1,15 @@
 ﻿using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 namespace ForEachDb;
 using CommandLine;
     
+[UsedImplicitly]
 public class Options
 {
+    [Option('q', "query", Required = true, HelpText = "Query to run against each database")]
+    public string? Query { get; set; }
+    
     [Option('h', "host", HelpText = "Hostname to connect to.", Default = "localhost")]
     public string? HostName { get; set; }
     
@@ -19,11 +24,8 @@ public class Options
     
     [Option("port", HelpText = "Password for the connection", Default = 5432)]
     public int Port { get; set; }
-
-    [Option('q', "query", Required = true, HelpText = "Query to run against each database")]
-    public string? Query { get; set; }
     
-    [Option("ignore", HelpText = "List of databases that should be ignored")]
+    [Option("ignore", HelpText = "List of databases that should be ignored. E.g: --ignore foo bar baz")]
     public IEnumerable<string>? IgnoreDatabases { get; set; }
     
     [Option("include-postgres-db", HelpText = "Flag to include the postgres database")]
