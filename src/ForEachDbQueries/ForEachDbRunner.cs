@@ -38,15 +38,17 @@ public class ForEachDbRunner : IForEachDbRunner
 
         await Parallel.ForEachAsync(databases, options, async (database, token) =>
         {
-            _logger.LogInformation("Running query against database: {Database}", database);
+            _logger.LogInformation("{Database} | Query starting", database);
             var connection = SwitchDatabaseConnection(database);
             await connection.OpenAsync(token);
             var results = (await connection.QueryAsync<TQueryResult>(queryTemplate)).Where(r => r != null).ToArray();
 
             foreach (var result in results)
             {
-                _logger.LogInformation("{Message}", result?.ToString());
+                _logger.LogInformation("{Database} | {Message}", database, result?.ToString());
             }
+            
+            _logger.LogInformation("{Database}: Query complete", database);
             
             allResults.AddRange(results);
             await connection.CloseAsync();
