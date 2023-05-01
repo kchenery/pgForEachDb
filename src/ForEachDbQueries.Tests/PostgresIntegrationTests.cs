@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -5,23 +7,23 @@ using FluentAssertions;
 using Npgsql;
 using NUnit.Framework;
 using Testcontainers.PostgreSql;
+using ForEachDbQueries.DapperExtensions;
 
 namespace ForEachDbQueries.Tests;
 
 public class PostgresIntegrationTests
 {
-    private const string PG_DATABASE = "ignored";
-    private const string PG_USERNAME = "postgres";
-    private const string PG_PASSWORD = "postgres";
-    const int PG_PORT = 54321;
+    private const string PgDatabase = "ignored";
+    private const string PgUsername = "postgres";
+    private const string PgPassword = "postgres";
+    private const int PgPort = 54321;
     
     private NpgsqlConnection? _pgConn;
 
     private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder()
-        .WithDatabase(PG_DATABASE)
-        .WithUsername(PG_USERNAME)
-        .WithPassword(PG_PASSWORD)
-        .WithPortBinding(PG_PORT)
+        .WithDatabase(PgDatabase)
+        .WithUsername(PgUsername)
+        .WithPassword(PgPassword)
         .Build();
     
     [OneTimeSetUp]
@@ -29,7 +31,7 @@ public class PostgresIntegrationTests
     {
         await _postgresqlContainer.StartAsync();
         _pgConn = new NpgsqlConnection(_postgresqlContainer.GetConnectionString());
-
+        await _pgConn.ExecuteAsync("CREATE DATABASE foo");
     }
 
     [OneTimeTearDown]
@@ -127,5 +129,20 @@ public class PostgresIntegrationTests
         // Assert
         ignoreResults.Should().NotContain("ignored");
         includeResults.Should().Contain("ignored");
+    }
+
+    [TestCase(new object[] {})]
+    [TestCase(new object[] {"foo"})]
+    [TestCase(new object[] {"foo", "bar"})]
+    [TestCase(new object[] {"foo", "bar", "baz"})]
+    [Test]
+    public async Task ForEachDbQuery_WithIgnoreDatabases_ShouldNotReturnSuppliedDatabases(
+        params string[] ignoredDatabases)
+    {
+        // Arrange
+        var ignored = new DatabaseFinder().IgnoreDatabases(ignoredDatabases);
+        
+        // Act
+        var ignoreResults = (await _pgConn.QueryAsync<string>(ignored)).ToList();
     }
 }

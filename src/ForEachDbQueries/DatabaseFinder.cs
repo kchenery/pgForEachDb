@@ -28,7 +28,17 @@ public class DatabaseFinder : IDatabaseFinder
         _sqlBuilder.Where($"datname != {paramName}", param);
         return this;
     }
-    
+
+    public IDatabaseFinder IgnoreDatabases(IEnumerable<string> databases)
+    {
+        foreach (var database in databases ?? Enumerable.Empty<string>())
+        {
+            IgnoreDatabase(database);
+        }
+
+        return this;
+    }
+
     public IDatabaseFinder IgnorePostgresDb() => IgnoreDatabase("postgres");
 
     public IDatabaseFinder OrderByName(bool ascending = true)

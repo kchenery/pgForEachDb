@@ -1,7 +1,7 @@
 using CommandLine;
-using Dapper;
 using ForEachDb;
 using ForEachDbQueries;
+using ForEachDbQueries.DapperExtensions;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -36,14 +36,9 @@ Parser.Default.ParseArguments<Options>(args)
         options.Password ??= ReadLine.ReadPassword("Password: ");
         
         if (options.Query is not null) query = options.Query;
-        if (options.IgnoreDatabases is not null) ignoreDatabases.AddRange(options.IgnoreDatabases);
+        if (options.IgnoreDatabases is not null) dbFinder.IgnoreDatabases(options.IgnoreDatabases);
         if (!options.IncludePostgresDb) dbFinder.IgnorePostgresDb();
         if (!options.IncludeTemplateDb) dbFinder.IgnoreTemplateDb();
-        
-        foreach (var ignoreDb in ignoreDatabases)
-        {
-            dbFinder.IgnoreDatabase(ignoreDb);
-        }
 
         var csBuilder = new NpgsqlConnectionStringBuilder
         {
@@ -62,7 +57,7 @@ if (!string.IsNullOrEmpty(connectionString))
 {
     var connection = new NpgsqlConnection(connectionString);
     
-    var databases = (await connection.QueryAsync<string>(dbFinder.Query().RawSql, dbFinder.Query().Parameters)).Order().ToList();
+    var databases = (await connection.QueryAsync<string>(dbFinder)).Order().ToList();
 
     if (databases.Any())
     {
