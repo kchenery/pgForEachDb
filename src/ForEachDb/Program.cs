@@ -22,6 +22,7 @@ using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
 var logger = loggerFactory.CreateLogger<ForEachDbRunner>();
 
 var dbFinder = new DatabaseFinder();
+var threads = -1;
 
 // Parse arguments
 Parser.Default.ParseArguments<Options>(args)
@@ -50,7 +51,17 @@ Parser.Default.ParseArguments<Options>(args)
         };
 
         connectionString = csBuilder.ToString();
+
+        threads = options.Threads;
+        
+        Console.WriteLine();
+        Console.WriteLine($"Host:     {csBuilder.Host}");
+        Console.WriteLine($"Username: {csBuilder.Username}");
+        Console.WriteLine($"Threads:  {threads}");
     });
+
+// Disable query timeout
+Dapper.SqlMapper.Settings.CommandTimeout = 0;
 
 // Find databases and run query against them
 if (!string.IsNullOrEmpty(connectionString))
@@ -62,7 +73,7 @@ if (!string.IsNullOrEmpty(connectionString))
     if (databases.Any())
     {
         var forEachDb = new ForEachDbRunner(connectionString, logger);
-        await forEachDb.RunQueryAsync(databases, query);
+        await forEachDb.RunQueryAsync(databases, query, threads);
     }
     else
     {

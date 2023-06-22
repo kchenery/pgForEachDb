@@ -22,6 +22,9 @@ public class Options
     [Option('p', "password", HelpText = "Password for the connection")]
     public string? Password { get; set; }
     
+    [Option('t', "threads", HelpText = "Number of threads to run", Default = 4)]
+    public int Threads { get; set; }
+    
     [Option("port", HelpText = "Password for the connection", Default = 5432)]
     public int Port { get; set; }
     
