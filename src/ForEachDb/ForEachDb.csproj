@@ -13,7 +13,7 @@
       <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-      <PackageReference Include="Npgsql" Version="7.0.6" />
+      <PackageReference Include="Npgsql" Version="8.0.0" />
       <PackageReference Include="ReadLine" Version="2.0.1" />
     </ItemGroup>
 
