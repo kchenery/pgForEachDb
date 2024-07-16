@@ -16,9 +16,8 @@ public class PostgresIntegrationTests
     private const string PgDatabase = "ignored";
     private const string PgUsername = "postgres";
     private const string PgPassword = "postgres";
-    private const int PgPort = 54321;
     
-    private NpgsqlConnection? _pgConn;
+    private NpgsqlConnection _pgConn = default!;
 
     private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder()
         .WithDatabase(PgDatabase)
