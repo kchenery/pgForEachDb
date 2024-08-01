@@ -70,7 +70,7 @@ if (!string.IsNullOrEmpty(connectionString))
     
     var databases = (await connection.QueryAsync<string>(dbFinder)).Order().ToList();
 
-    if (databases.Any())
+    if (databases.Count != 0)
     {
         var forEachDb = new ForEachDbRunner(connectionString, logger);
         await forEachDb.RunQueryAsync(databases, query, threads);
