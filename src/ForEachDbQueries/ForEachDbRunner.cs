@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Text;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -59,6 +60,19 @@ public class ForEachDbRunner : IForEachDbRunner
 
     public async Task RunQueryAsync(IEnumerable<string> databases, string queryTemplate, int numberOfThreads = -1)
     {
-        await RunQueryAsync<object>(databases, queryTemplate, numberOfThreads);
+        await RunQueryAsync<object>(databases, TidyQuery(queryTemplate), numberOfThreads);
+    }
+    
+    public string TidyQuery(string queryTemplate)
+    {
+        var query = new StringBuilder();
+        query.Append(queryTemplate.Trim());
+        
+        if(query[^1] != ';')
+        {
+            query.Append(';');
+        }
+
+        return query.ToString();
     }
 }
