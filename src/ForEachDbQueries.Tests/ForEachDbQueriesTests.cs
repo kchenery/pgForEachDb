@@ -68,7 +68,6 @@ public class ForEachDbQueriesTests
         
         // Assert
         query.RawSql.Trim().Should().Match(expectedSql);
-        
     }
 
     [Test]
