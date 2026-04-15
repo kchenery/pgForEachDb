@@ -1,23 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 
 namespace ForEachDbQueries.Tests;
 
 public class ForEachDbQueriesTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     [Test]
     public void ForEachDbQuery_WithMultipleIgnoreDatabases_ShouldParameteriseIndividually()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datname != @database2 AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datname != @database2 AND datallowconn = true AND datname != 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder()
             .IgnoreDatabase("foo")
@@ -42,7 +37,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithIgnoreTemplateDatabases_ShouldFilterOutTemplateDatabases()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname != 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder()
             .IgnoreTemplateDb();
@@ -58,7 +53,7 @@ public class ForEachDbQueriesTests
     public void ForEachDbQuery_WithIgnorePostgresDb_ShouldFilterOutPostgresDb()
     {
         // Arrange
-        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datallowconn = true AND datname NOT LIKE 'rdsadmin'";
+        var expectedSql = "SELECT datname FROM pg_database WHERE datname != @database1 AND datallowconn = true AND datname != 'rdsadmin'";
         
         var dbFinder = new DatabaseFinder();
         dbFinder.IgnorePostgresDb();
@@ -72,7 +67,7 @@ public class ForEachDbQueriesTests
 
     [Test]
     [TestCase(true, "SELECT datname FROM pg_database WHERE datallowconn = true")]
-    [TestCase(false, "SELECT datname FROM pg_database WHERE datallowconn = true AND datname NOT LIKE 'rdsadmin'")]
+    [TestCase(false, "SELECT datname FROM pg_database WHERE datallowconn = true AND datname != 'rdsadmin'")]
     public void ForEachDbQuery_WithIncludeRdsAdmin_ShouldNotFilterOutRdsAdmin(bool includeRdsAdmin, string expectedSql)
     {
         // Arrange

@@ -1,6 +1,6 @@
 namespace ForEachDbQueries.Tests;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 
 public class ParametersExtensionsTests

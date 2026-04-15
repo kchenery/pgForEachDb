@@ -68,7 +68,7 @@ public class DatabaseFinder : IDatabaseFinder
 
         if (_ignoreRdsAdmin)
         {
-            _sqlBuilder.Where("datname NOT LIKE 'rdsadmin'");
+            _sqlBuilder.Where("datname != 'rdsadmin'");
         }
         
         return _sqlBuilder.AddTemplate(_queryTemplate);

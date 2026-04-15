@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using FluentAssertions;
+using AwesomeAssertions;
 using Npgsql;
 using NUnit.Framework;
 using Testcontainers.PostgreSql;
@@ -19,7 +17,7 @@ public class PostgresIntegrationTests
     
     private NpgsqlConnection _pgConn = default!;
 
-    private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder()
+    private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder("alpine:18")
         .WithDatabase(PgDatabase)
         .WithUsername(PgUsername)
         .WithPassword(PgPassword)
@@ -39,11 +37,6 @@ public class PostgresIntegrationTests
         await _postgresqlContainer.StopAsync();
     }
     
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     [Test]
     public async Task ForEachDbQuery_ShouldFindDatabases()
     {
@@ -140,8 +133,14 @@ public class PostgresIntegrationTests
     {
         // Arrange
         var ignored = new DatabaseFinder().IgnoreDatabases(ignoredDatabases);
-        
+
         // Act
         var ignoreResults = (await _pgConn.QueryAsync<string>(ignored)).ToList();
+
+        // Assert
+        foreach (var db in ignoredDatabases)
+        {
+            ignoreResults.Should().NotContain(db);
+        }
     }
 }

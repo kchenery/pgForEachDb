@@ -12,8 +12,9 @@ public static class DapperExtensions
         {
             throw new ArgumentNullException(nameof(cnn));
         }
-        
-        return cnn.QueryAsync<T>(dbFinder.Query().RawSql, dbFinder.Query().Parameters, transaction, commandTimeout,
+
+        var query = dbFinder.Query();
+        return cnn.QueryAsync<T>(query.RawSql, query.Parameters, transaction, commandTimeout,
             commandType);
     }
 }

@@ -25,7 +25,7 @@ public class Options
     [Option('t', "threads", HelpText = "Number of threads to run", Default = 4)]
     public int Threads { get; set; }
     
-    [Option("port", HelpText = "Password for the connection", Default = 5432)]
+    [Option("port", HelpText = "Port for the connection", Default = 5432)]
     public int Port { get; set; }
     
     [Option("ignore", HelpText = "List of databases that should be ignored. E.g: --ignore foo bar baz")]
