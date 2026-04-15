@@ -7,8 +7,11 @@ using CommandLine;
 [UsedImplicitly]
 public class Options
 {
-    [Option('q', "query", Required = true, HelpText = "Query to run against each database")]
+    [Option('q', "query", HelpText = "Query to run against each database")]
     public string? Query { get; set; }
+
+    [Option('i', "interactive", HelpText = "Interactive mode: select databases and enter queries interactively")]
+    public bool Interactive { get; set; }
     
     [Option('h', "host", HelpText = "Hostname to connect to.", Default = "localhost")]
     public string? HostName { get; set; }

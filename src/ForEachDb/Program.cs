@@ -7,7 +7,7 @@ using Spectre.Console;
 
 string connectionString = "";
 string query = "";
-List<string> ignoreDatabases = new();
+bool interactive = false;
 
 var dbFinder = new DatabaseFinder();
 var threads = -1;
@@ -18,7 +18,15 @@ Parser.Default.ParseArguments<Options>(args)
     {
         if (options is null)
         {
-            throw new ArgumentNullException(nameof(options),"Must specify options");
+            throw new ArgumentNullException(nameof(options), "Must specify options");
+        }
+
+        interactive = options.Interactive;
+
+        if (!interactive && string.IsNullOrEmpty(options.Query))
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] --query is required unless --interactive is set.");
+            Environment.Exit(1);
         }
 
         // Handle required fields
@@ -52,16 +60,64 @@ Parser.Default.ParseArguments<Options>(args)
 // Disable query timeout
 Dapper.SqlMapper.Settings.CommandTimeout = 0;
 
-// Find databases and run query against them
-if (!string.IsNullOrEmpty(connectionString))
+if (string.IsNullOrEmpty(connectionString))
+    return;
+
+await using var connection = new NpgsqlConnection(connectionString);
+var allDatabases = (await connection.QueryAsync<string>(dbFinder)).Order().ToList();
+
+if (allDatabases.Count == 0)
 {
-    await using var connection = new NpgsqlConnection(connectionString);
+    AnsiConsole.MarkupLine("[yellow]No databases found to run query against[/]");
+    return;
+}
 
-    var databases = (await connection.QueryAsync<string>(dbFinder)).Order().ToList();
+var databases = allDatabases;
+var forEachDb = new ForEachDbRunner(connectionString);
 
-    if (databases.Count != 0)
+if (interactive)
+{
+    var selectDatabases = true;
+
+    while (true)
     {
-        var forEachDb = new ForEachDbRunner(connectionString);
+        if (selectDatabases)
+        {
+            var prompt = new MultiSelectionPrompt<string>()
+                .Title("[bold]Select databases to target:[/]")
+                .PageSize(15)
+                .InstructionsText("[dim](Press [blue]<space>[/] to toggle, [green]<enter>[/] to confirm)[/]")
+                .AddChoices(allDatabases);
+
+            foreach (var db in databases)
+            {
+                prompt.Select(db);
+            }
+
+            databases = AnsiConsole.Prompt(prompt);
+
+            AnsiConsole.MarkupLine($"[dim]Selected {databases.Count} database(s)[/]");
+        }
+
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[dim]Enter a query, [bold]\\r[/] to reselect databases, or empty to quit.[/]");
+        var input = AnsiConsole.Prompt(
+            new TextPrompt<string>("[bold]SQL>[/] ")
+                .AllowEmpty()
+                .PromptStyle("green"));
+
+        if (string.IsNullOrWhiteSpace(input))
+            break;
+
+        if (input.Trim().Equals("\\r", StringComparison.OrdinalIgnoreCase))
+        {
+            selectDatabases = true;
+            continue;
+        }
+
+        selectDatabases = false;
+        query = input;
+        AnsiConsole.WriteLine();
 
         await AnsiConsole.Live(Text.Empty).StartAsync(async ctx =>
         {
@@ -70,8 +126,13 @@ if (!string.IsNullOrEmpty(connectionString))
             ctx.UpdateTarget(renderer.BuildDisplay());
         });
     }
-    else
+}
+else
+{
+    await AnsiConsole.Live(Text.Empty).StartAsync(async ctx =>
     {
-        AnsiConsole.MarkupLine("[yellow]No databases found to run query against[/]");
-    }
+        using var renderer = new LiveProgressRenderer(ctx, databases.Count);
+        await forEachDb.RunQueryAsync(databases, query, threads, renderer);
+        ctx.UpdateTarget(renderer.BuildDisplay());
+    });
 }

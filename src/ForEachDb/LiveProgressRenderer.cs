@@ -51,7 +51,7 @@ public sealed class LiveProgressRenderer : IProgress<DatabaseStatus>, IDisposabl
         {
             rows.Add(db.State == DatabaseRunState.Succeeded
                 ? new Markup($"[green]\u2714[/] {Markup.Escape(db.DatabaseName)}")
-                : new Markup($"[red]\u2718[/] {Markup.Escape(db.DatabaseName)} [dim]- {Markup.Escape(Truncate(db.ErrorMessage ?? "Unknown error", 80))}[/]"));
+                : new Markup($"[red]\u2718[/] {Markup.Escape(db.DatabaseName)} [dim]- {Markup.Escape(Sanitize(db.ErrorMessage ?? "Unknown error", 80))}[/]"));
         }
 
         if (completed.Count > 0 && running.Count > 0)
@@ -79,6 +79,9 @@ public sealed class LiveProgressRenderer : IProgress<DatabaseStatus>, IDisposabl
         _animationTimer.Dispose();
     }
 
-    private static string Truncate(string value, int maxLength) =>
-        value.Length <= maxLength ? value : string.Concat(value.AsSpan(0, maxLength), "...");
+    private static string Sanitize(string value, int maxLength)
+    {
+        var oneLine = value.ReplaceLineEndings(" ");
+        return oneLine.Length <= maxLength ? oneLine : string.Concat(oneLine.AsSpan(0, maxLength), "...");
+    }
 }
