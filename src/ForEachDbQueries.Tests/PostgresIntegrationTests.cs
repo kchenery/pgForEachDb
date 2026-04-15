@@ -17,7 +17,7 @@ public class PostgresIntegrationTests
     
     private NpgsqlConnection _pgConn = default!;
 
-    private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder("alpine:18")
+    private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder("postgres:18-alpine")
         .WithDatabase(PgDatabase)
         .WithUsername(PgUsername)
         .WithPassword(PgPassword)
