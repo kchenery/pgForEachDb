@@ -11,7 +11,7 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-      <PackageReference Include="Spectre.Console" Version="0.55.0" />
+      <PackageReference Include="Spectre.Console" Version="0.55.2" />
       <PackageReference Include="Npgsql" Version="10.0.2" />
       <PackageReference Include="ReadLine" Version="2.0.1" />
     </ItemGroup>
