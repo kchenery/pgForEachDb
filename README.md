@@ -4,13 +4,69 @@ Run a SQL statement across multiple PostgreSQL databases on a server in parallel
 
 Features a live progress display showing which databases are running, which have completed, and which failed.
 
-## Usage
+## TUI
+
+Launching with no arguments (or `--tui`) opens a full Terminal.Gui interface with database selection, query editor, live per-database status, a scrollable log pane, results grid, CSV export, and saved "recipes".
+
+```bash
+./ForEachDb          # launches the TUI
+./ForEachDb --tui    # same thing
+```
+
+### Layout
+
+```
+┌ File │ Run │ View │ Recipes │ Help ─────────────────────────────────┐
+│ ┌─ Databases ──────┐ ┌─ Log (all) ──────────────────────────────┐   │
+│ │ [x] ✔ analytics  │ │ 14:02:11 analytics  INFO   Query started │   │
+│ │ [x] ⡇ orders     │ │ 14:02:12 analytics  INFO   Completed…    │   │
+│ │ [x] ○ billing    │ │ 14:02:11 orders     NOTICE autovacuum…   │   │
+│ └──────────────────┘ └──────────────────────────────────────────┘   │
+│ ┌─ SQL — Ctrl+Enter or F5 to run ·  Ctrl+Up/Down history ─────────┐ │
+│ │ ANALYZE;                                                        │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+│ 12/12 selected  threads 8  RUNNING  2 done, 0 failed  …  F5 run …  │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### Keybindings
+
+| Keys | Action |
+| --- | --- |
+| `F5` / `Ctrl+Enter` | Run query against selected databases |
+| `F6` | Cancel the active run |
+| `Esc` / `Ctrl+Q` | Quit (`Esc` during a run cancels first) |
+| `Space` | Toggle the highlighted database |
+| `Ctrl+A` / `Ctrl+N` | Select all / none |
+| `Ctrl+T` | Change thread count (1–64) |
+| `Ctrl+L` | Cycle log filter: all → selected DB → failed only |
+| `Ctrl+R` | Open the results grid (after a run that returned rows) |
+| `Ctrl+E` | Export results as CSV (inside the results grid) |
+| `Ctrl+S` | Save current connection + selection + query as a recipe |
+| `Ctrl+Up` / `Ctrl+Down` | Previous / next query from session history |
+| `Enter` on a failed row | Show the full error message |
+| `F1` | Keybindings help |
+
+### Results and CSV export
+
+When a `SELECT` finishes, press `Ctrl+R` to open a grid showing every row with a `database` column prepended. If databases return different column sets, the grid shows the union and fills missing cells with blanks. `Ctrl+E` inside the grid streams a full CSV to a chosen file — the grid preview caps at 10,000 rows but the export always contains everything.
+
+### Recipes
+
+A *recipe* bundles a connection (host / port / user / db / filters), a database selection, a query, and a thread count into a named save. Recipes never store passwords.
+
+- **Save** — `Ctrl+S` from the main window
+- **Load** — "Load recipe" button in the connection dialog at launch; after loading, enter the password and press Connect
+
+Recipes live at `$XDG_CONFIG_HOME/pgForEachDb/recipes.json` (Unix, defaulting to `~/.config/pgForEachDb/recipes.json`) or `%APPDATA%\pgForEachDb\recipes.json` (Windows).
+
+## CLI usage
 
 ```
 ./ForEachDb --help
 
   -q, --query              Query to run against each database
-  -i, --interactive        Interactive mode: select databases and enter queries interactively
+  -i, --interactive        [Deprecated] Legacy Spectre interactive mode. Use the TUI instead (no args).
   -h, --host               (Default: localhost) Hostname to connect to
   -d, --database           (Default: postgres) Database to connect to
   -u, --username           (Default: postgres) Username for the connection

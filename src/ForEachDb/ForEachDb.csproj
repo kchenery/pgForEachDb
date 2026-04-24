@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ForEachDbQueries\ForEachDbQueries.csproj" />
+      <ProjectReference Include="..\ForEachDb.Tui\ForEachDb.Tui.csproj" />
     </ItemGroup>
 
     <ItemGroup>

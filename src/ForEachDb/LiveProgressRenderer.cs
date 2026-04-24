@@ -38,7 +38,7 @@ public sealed class LiveProgressRenderer : IProgress<DatabaseStatus>, IDisposabl
         var dots = DotFrames[Volatile.Read(ref _frame) % DotFrames.Length];
 
         var completed = _statuses.Values
-            .Where(s => s.State is DatabaseRunState.Succeeded or DatabaseRunState.Failed)
+            .Where(s => s.State is DatabaseRunState.Succeeded or DatabaseRunState.Failed or DatabaseRunState.Cancelled)
             .OrderBy(s => s.DatabaseName)
             .ToList();
 
@@ -49,9 +49,12 @@ public sealed class LiveProgressRenderer : IProgress<DatabaseStatus>, IDisposabl
 
         foreach (var db in completed)
         {
-            rows.Add(db.State == DatabaseRunState.Succeeded
-                ? new Markup($"[green]\u2714[/] {Markup.Escape(db.DatabaseName)}")
-                : new Markup($"[red]\u2718[/] {Markup.Escape(db.DatabaseName)} [dim]- {Markup.Escape(Sanitize(db.ErrorMessage ?? "Unknown error", 80))}[/]"));
+            rows.Add(db.State switch
+            {
+                DatabaseRunState.Succeeded => new Markup($"[green]\u2714[/] {Markup.Escape(db.DatabaseName)}"),
+                DatabaseRunState.Cancelled => new Markup($"[dim]\u25cb {Markup.Escape(db.DatabaseName)} - cancelled[/]"),
+                _ => new Markup($"[red]\u2718[/] {Markup.Escape(db.DatabaseName)} [dim]- {Markup.Escape(Sanitize(db.ErrorMessage ?? "Unknown error", 80))}[/]")
+            });
         }
 
         if (completed.Count > 0 && running.Count > 0)
