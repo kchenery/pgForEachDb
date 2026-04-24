@@ -1,4 +1,4 @@
-namespace ForEachDb.Tui.Models;
+namespace ForEachDbQueries;
 
 public sealed record Recipe(
     string Name,

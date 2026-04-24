@@ -1,4 +1,4 @@
-namespace ForEachDb.Tui.Sessions;
+namespace ForEachDbQueries;
 
 public enum RunOutcomeKind
 {

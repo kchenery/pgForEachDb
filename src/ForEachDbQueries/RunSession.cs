@@ -1,13 +1,10 @@
-using ForEachDb.Tui.Models;
-using ForEachDbQueries;
 using Npgsql;
 
-namespace ForEachDb.Tui.Sessions;
+namespace ForEachDbQueries;
 
 /// <summary>
-/// Owns the run lifecycle (selection-independent state, cancellation, results, statuses, log stream)
-/// so it can be unit tested without Terminal.Gui. MainWindow subscribes to events and marshals them
-/// onto the UI thread.
+/// Owns the run lifecycle (cancellation, results, statuses, log stream) so UI frameworks
+/// can subscribe to events rather than build the plumbing themselves.
 /// </summary>
 public sealed class RunSession
 {

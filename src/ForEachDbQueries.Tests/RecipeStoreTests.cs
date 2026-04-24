@@ -1,10 +1,8 @@
 using System.IO;
 using AwesomeAssertions;
-using ForEachDb.Tui.Infrastructure;
-using ForEachDb.Tui.Models;
 using NUnit.Framework;
 
-namespace ForEachDb.Tui.Tests;
+namespace ForEachDbQueries.Tests;
 
 public class RecipeStoreTests
 {

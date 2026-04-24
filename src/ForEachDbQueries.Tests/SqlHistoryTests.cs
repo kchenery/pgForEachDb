@@ -1,8 +1,7 @@
 using AwesomeAssertions;
-using ForEachDb.Tui.Infrastructure;
 using NUnit.Framework;
 
-namespace ForEachDb.Tui.Tests;
+namespace ForEachDbQueries.Tests;
 
 public class SqlHistoryTests
 {

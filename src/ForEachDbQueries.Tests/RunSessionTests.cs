@@ -1,10 +1,7 @@
 using AwesomeAssertions;
-using ForEachDb.Tui.Models;
-using ForEachDb.Tui.Sessions;
-using ForEachDbQueries;
 using NUnit.Framework;
 
-namespace ForEachDb.Tui.Tests;
+namespace ForEachDbQueries.Tests;
 
 public class RunSessionTests
 {

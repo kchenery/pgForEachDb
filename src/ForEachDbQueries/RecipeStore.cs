@@ -1,7 +1,6 @@
 using System.Text.Json;
-using ForEachDb.Tui.Models;
 
-namespace ForEachDb.Tui.Infrastructure;
+namespace ForEachDbQueries;
 
 public sealed class RecipeStore
 {

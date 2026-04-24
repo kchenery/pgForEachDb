@@ -1,4 +1,4 @@
-namespace ForEachDb.Tui.Infrastructure;
+namespace ForEachDbQueries;
 
 /// <summary>
 /// Per-session ring buffer of submitted SQL statements with up/down navigation.
@@ -19,6 +19,8 @@ public sealed class SqlHistory
 
     public int Count => _entries.Count;
 
+    public IReadOnlyList<string> Snapshot() => _entries.ToList();
+
     public void Push(string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -37,11 +39,6 @@ public sealed class SqlHistory
         _draft = string.Empty;
     }
 
-    /// <summary>
-    /// Moves one step toward older entries. On the first call from the draft position,
-    /// `currentText` is saved so it can be restored via <see cref="Newer"/>.
-    /// Returns null if there is nothing older to show.
-    /// </summary>
     public string? Older(string currentText)
     {
         if (_entries.Count == 0) return null;
@@ -62,11 +59,6 @@ public sealed class SqlHistory
         return null;
     }
 
-    /// <summary>
-    /// Moves one step toward newer entries. When stepping past the newest entry,
-    /// the saved draft is returned and the history returns to the draft position.
-    /// Returns null if already at the draft position.
-    /// </summary>
     public string? Newer()
     {
         if (_index == -1) return null;
