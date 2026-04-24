@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ForEachDb.Console.ViewModels"
+             xmlns:q="clr-namespace:ForEachDbQueries;assembly=ForEachDbQueries"
+             x:Class="ForEachDb.Console.Views.ConnectionView"
+             x:DataType="vm:ConnectionViewModel">
+  <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="2">
+    <TextBlock Grid.Row="0" Text="pgForEachDb — Connect" FontWeight="Bold" Margin="0,0,0,1" />
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,2*" RowDefinitions="Auto,*">
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Recipes (↵ to load)" FontWeight="Bold" />
+      <TextBlock Grid.Row="0" Grid.Column="1" Text="Connection" FontWeight="Bold" Margin="1,0,0,0" />
+
+      <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" Margin="0,0,1,0" Padding="0">
+        <ListBox x:Name="RecipesList"
+                 ItemsSource="{Binding Recipes}"
+                 SelectionMode="Single"
+                 DoubleTapped="OnRecipeActivated">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="q:Recipe">
+              <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+
+      <Border Grid.Row="1" Grid.Column="1" BorderThickness="1" Padding="1">
+        <StackPanel Spacing="0">
+          <Grid ColumnDefinitions="12,*,6,10">
+            <TextBlock Grid.Column="0" Text="Host"     VerticalAlignment="Center" />
+            <TextBox   Grid.Column="1" Text="{Binding Host, Mode=TwoWay}" />
+            <TextBlock Grid.Column="2" Text="Port"     VerticalAlignment="Center" Margin="1,0" />
+            <TextBox   Grid.Column="3" Text="{Binding Port, Mode=TwoWay}" />
+          </Grid>
+          <Grid ColumnDefinitions="12,*">
+            <TextBlock Grid.Column="0" Text="Database" VerticalAlignment="Center" />
+            <TextBox   Grid.Column="1" Text="{Binding Database, Mode=TwoWay}" />
+          </Grid>
+          <Grid ColumnDefinitions="12,*">
+            <TextBlock Grid.Column="0" Text="Username" VerticalAlignment="Center" />
+            <TextBox   Grid.Column="1" Text="{Binding Username, Mode=TwoWay}" />
+          </Grid>
+          <Grid ColumnDefinitions="12,*">
+            <TextBlock Grid.Column="0" Text="Password" VerticalAlignment="Center" />
+            <TextBox   Grid.Column="1" Text="{Binding Password, Mode=TwoWay}" PasswordChar="*" />
+          </Grid>
+          <CheckBox Content="Include the 'postgres' database" IsChecked="{Binding IncludePostgres, Mode=TwoWay}" />
+          <CheckBox Content="Include template databases"      IsChecked="{Binding IncludeTemplate, Mode=TwoWay}" />
+          <Grid ColumnDefinitions="12,*">
+            <TextBlock Grid.Column="0" Text="Ignore"   VerticalAlignment="Center" />
+            <TextBox   Grid.Column="1" Text="{Binding IgnoreList, Mode=TwoWay}" Watermark="comma, separated, list" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="1" Margin="0,1,0,0">
+      <Button Content="_Connect" Command="{Binding ConnectCommand}" IsDefault="True" />
+      <Button Content="_Quit" Click="OnQuit" />
+    </StackPanel>
+
+    <TextBlock Grid.Row="3" Text="{Binding Status}" Margin="0,1,0,0" />
+  </Grid>
+</UserControl>

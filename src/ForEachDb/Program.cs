@@ -5,10 +5,10 @@ using ForEachDbQueries.DapperExtensions;
 using Npgsql;
 using Spectre.Console;
 
-// Launch the Spectre interactive app when invoked with no arguments or --tui.
+// Launch the Consolonia TUI when invoked with no arguments or --tui.
 if (args.Length == 0 || args.Any(a => string.Equals(a, "--tui", StringComparison.OrdinalIgnoreCase)))
 {
-    await ForEachDb.Interactive.InteractiveApp.RunAsync();
+    ForEachDb.Console.Program.Run(args);
     return;
 }
 

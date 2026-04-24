@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ForEachDbQueries\ForEachDbQueries.csproj" />
+      <ProjectReference Include="..\ForEachDb.Console\ForEachDb.Console.csproj" />
     </ItemGroup>
 
     <ItemGroup>

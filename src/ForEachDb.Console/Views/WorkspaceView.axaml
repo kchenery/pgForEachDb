@@ -1,0 +1,178 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ForEachDb.Console.ViewModels"
+             xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+             x:Class="ForEachDb.Console.Views.WorkspaceView"
+             x:DataType="vm:WorkspaceViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="1">
+
+    <!-- Header / toolbar -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+      <StackPanel Orientation="Horizontal" Spacing="2">
+        <TextBlock Text="pgForEachDb" FontWeight="Bold" />
+        <TextBlock Text="{Binding Host}" />
+        <TextBlock Text="as" />
+        <TextBlock Text="{Binding Username}" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="1">
+        <Button Content="_Run"         Command="{Binding RunCommand}"   IsDefault="True" />
+        <Button Content="Cancel"       Command="{Binding CancelCommand}" />
+        <Button Content="Next view (F2)" Command="{Binding ToggleViewCommand}" />
+        <Button Content="_Save recipe" Command="{Binding BeginSaveRecipeCommand}" />
+        <Button Content="_Export CSV"  Command="{Binding ExportCsvCommand}" />
+        <Button Content="_Disconnect"  Command="{Binding DisconnectCommand}" />
+        <Button Content="_Quit"        Click="OnQuit" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Body: left = db list, right = SQL + results -->
+    <Grid x:Name="BodyGrid" Grid.Row="1" Margin="0,1,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="28" MinWidth="12" />
+        <ColumnDefinition Width="1" />
+        <ColumnDefinition Width="*" MinWidth="20" />
+      </Grid.ColumnDefinitions>
+      <GridSplitter Grid.Column="1" ResizeDirection="Columns" Width="1" />
+
+      <!-- Database list -->
+      <Border BorderThickness="1" Padding="0" Margin="0,0,1,0">
+        <Grid RowDefinitions="Auto,*,Auto">
+          <TextBlock Grid.Row="0" Text="{Binding SelectionSummary}" FontWeight="Bold" Padding="1,0" />
+          <ListBox Grid.Row="1"
+                   x:Name="DatabaseList"
+                   ItemsSource="{Binding Databases}"
+                   DoubleTapped="OnDatabaseActivated"
+                   KeyDown="OnDatabaseListKeyDown">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:DatabaseItem">
+                <Grid ColumnDefinitions="4,*,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding Glyph}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Name}" />
+                  <TextBlock Grid.Column="2" Text="{Binding State}" Margin="1,0,0,0" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="1" Margin="1,0">
+            <Button Content="All"  Command="{Binding SelectAllCommand}" />
+            <Button Content="None" Command="{Binding SelectNoneCommand}" />
+            <TextBlock Text="Threads:" VerticalAlignment="Center" Margin="1,0,0,0" />
+            <NumericUpDown Value="{Binding Threads, Mode=TwoWay}"
+                           Minimum="1" Maximum="64" Increment="1" FormatString="0" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Right: one of Query / Results / Log fills the pane -->
+      <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto">
+        <!-- Pane tabs -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*">
+          <Button Grid.Column="0"
+                  Content="Query (F2)"
+                  Command="{Binding ShowQueryCommand}"
+                  IsEnabled="{Binding !IsShowingQuery}" />
+          <Button Grid.Column="1"
+                  Content="Results"
+                  Command="{Binding ShowResultsCommand}"
+                  IsEnabled="{Binding !IsShowingResults}"
+                  Margin="1,0,0,0" />
+          <Button Grid.Column="2"
+                  Content="Log"
+                  Command="{Binding ShowLogCommand}"
+                  IsEnabled="{Binding !IsShowingLog}"
+                  Margin="1,0,0,0" />
+          <TextBlock Grid.Column="3"
+                     Text="{Binding RunStatus}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Right"
+                     Margin="0,0,1,0" />
+        </Grid>
+
+        <!-- Query pane -->
+        <Border Grid.Row="1" BorderThickness="1" MinHeight="5"
+                IsVisible="{Binding IsShowingQuery}">
+          <TextBox x:Name="QueryEditor"
+                   Text="{Binding Query, Mode=TwoWay}"
+                   AcceptsReturn="True"
+                   TextWrapping="NoWrap"
+                   Watermark="-- SQL goes here. Ctrl+Enter to run. F2 cycles panes." />
+        </Border>
+
+        <!-- Results pane -->
+        <Border Grid.Row="1" BorderThickness="1" MinHeight="5"
+                IsVisible="{Binding IsShowingResults}">
+          <Panel>
+            <TextBlock Text="No results yet. Run a query (Ctrl+Enter)."
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       IsVisible="{Binding !Results.Count}" />
+            <dg:DataGrid ItemsSource="{Binding Results}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         HeadersVisibility="Column"
+                         GridLinesVisibility="All"
+                         CanUserResizeColumns="True"
+                         CanUserReorderColumns="True"
+                         CanUserSortColumns="True"
+                         x:Name="ResultsGrid" />
+          </Panel>
+        </Border>
+
+        <!-- Log pane -->
+        <Border Grid.Row="1" BorderThickness="1" MinHeight="5"
+                IsVisible="{Binding IsShowingLog}">
+          <Panel>
+            <TextBlock Text="No log output yet."
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       IsVisible="{Binding !Logs.Count}" />
+            <ListBox x:Name="LogList" ItemsSource="{Binding Logs}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LogRow">
+                  <Grid ColumnDefinitions="10,24,10,*">
+                    <TextBlock Grid.Column="0" Text="{Binding Timestamp}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Database}" />
+                    <TextBlock Grid.Column="2" Text="{Binding Level}" />
+                    <TextBlock Grid.Column="3" Text="{Binding Message}" TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Panel>
+        </Border>
+
+        <!-- Footer — filter (results) or clear (log) -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto,*"
+              IsVisible="{Binding IsShowingResults}"
+              Margin="0,1,0,0">
+          <TextBlock Text="Filter:" VerticalAlignment="Center" />
+          <ComboBox Grid.Column="1"
+                    ItemsSource="{Binding DatabaseFilters}"
+                    SelectedItem="{Binding DatabaseFilter, Mode=TwoWay}"
+                    Width="30"
+                    Margin="1,0" />
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="1"
+                    IsVisible="{Binding IsShowingLog}"
+                    Margin="0,1,0,0">
+          <Button Content="Clear log" Command="{Binding ClearLogCommand}" />
+          <TextBlock Text="{Binding Logs.Count, StringFormat={}{0} entries}" VerticalAlignment="Center" Margin="2,0,0,0" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <!-- Save recipe overlay -->
+    <Border Grid.Row="0" Grid.RowSpan="3"
+            IsVisible="{Binding IsSavingRecipe}"
+            Background="Black"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            BorderThickness="1" Padding="2">
+      <StackPanel Spacing="1" Width="40">
+        <TextBlock Text="Save recipe" FontWeight="Bold" />
+        <TextBox Text="{Binding SaveRecipeName, Mode=TwoWay}" Watermark="recipe name" />
+        <StackPanel Orientation="Horizontal" Spacing="1" HorizontalAlignment="Right">
+          <Button Content="_Save"   Command="{Binding ConfirmSaveRecipeCommand}" IsDefault="True" />
+          <Button Content="_Cancel" Command="{Binding CancelSaveRecipeCommand}"  IsCancel="True" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
