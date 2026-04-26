@@ -29,9 +29,9 @@ public sealed class RecipeStore
             var doc = JsonSerializer.Deserialize<RecipeFile>(json, JsonOptions);
             return doc?.Recipes?.ToList() ?? [];
         }
-        catch (JsonException)
+        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
-            // Treat a corrupt file as empty rather than crashing; user can recreate.
+            // Treat a corrupt or unreadable file as empty rather than crashing; user can recreate.
             return [];
         }
     }

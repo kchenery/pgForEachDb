@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ForEachDb.Desktop.ViewModels"
+             xmlns:q="clr-namespace:ForEachDbQueries;assembly=ForEachDbQueries"
+             x:Class="ForEachDb.Desktop.Views.ConnectionView"
+             x:DataType="vm:ConnectionViewModel">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Width="860"
+                HorizontalAlignment="Center"
+                Margin="24,40,24,40"
+                Spacing="24">
+
+      <!-- Hero header -->
+      <StackPanel Spacing="12">
+        <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+          <Image Source="avares://ForEachDb.Desktop/Assets/logo.png" Width="44" Height="44" />
+          <TextBlock Text="pgForEachDb" Classes="h1" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBlock Text="Run SQL across many PostgreSQL databases in parallel."
+                   Classes="muted" FontSize="15" />
+      </StackPanel>
+
+      <!-- Card with recipes + form -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="280,1,*" MinHeight="440">
+
+          <!-- Recipes column -->
+          <Grid Grid.Column="0" RowDefinitions="Auto,*">
+            <StackPanel Grid.Row="0" Margin="20,20,20,8" Spacing="4">
+              <TextBlock Text="SAVED RECIPES" Classes="label" />
+              <TextBlock Text="Double-click to load" Classes="muted" FontSize="12" />
+            </StackPanel>
+            <Panel Grid.Row="1" Margin="8,0,8,16">
+              <TextBlock Text="No recipes yet"
+                         Classes="muted"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         IsVisible="{Binding !Recipes.Count}" />
+              <ListBox x:Name="RecipesList"
+                       ItemsSource="{Binding Recipes}"
+                       SelectionMode="Single"
+                       DoubleTapped="OnRecipeActivated">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="q:Recipe">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Name}" FontWeight="500" />
+                      <TextBlock Text="{Binding Connection.Host}" Classes="muted" FontSize="11" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Panel>
+          </Grid>
+
+          <Rectangle Grid.Column="1" Width="1" Fill="{DynamicResource BorderBrush}" />
+
+          <!-- Form column -->
+          <StackPanel Grid.Column="2" Margin="28,24,28,24" Spacing="14">
+            <TextBlock Text="CONNECTION" Classes="label" />
+
+            <Grid ColumnDefinitions="*,120" ColumnSpacing="10">
+              <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="Host" Classes="muted" FontSize="12" />
+                <TextBox Text="{Binding Host, Mode=TwoWay}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="Port" Classes="muted" FontSize="12" />
+                <TextBox Text="{Binding Port, Mode=TwoWay}" />
+              </StackPanel>
+            </Grid>
+
+            <StackPanel Spacing="4">
+              <TextBlock Text="Maintenance database" Classes="muted" FontSize="12" />
+              <TextBox Text="{Binding Database, Mode=TwoWay}" />
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+              <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="Username" Classes="muted" FontSize="12" />
+                <TextBox Text="{Binding Username, Mode=TwoWay}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="Password" Classes="muted" FontSize="12" />
+                <TextBox Text="{Binding Password, Mode=TwoWay}" PasswordChar="•" />
+              </StackPanel>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+              <TextBlock Grid.Column="0"
+                         Text="{Binding Status}"
+                         Classes="muted"
+                         TextWrapping="Wrap"
+                         VerticalAlignment="Center" />
+              <Button Grid.Column="1"
+                      Content="Connect"
+                      Classes="accent"
+                      Command="{Binding ConnectCommand}"
+                      IsDefault="True"
+                      MinWidth="110"
+                      Margin="12,0,0,0" />
+            </Grid>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

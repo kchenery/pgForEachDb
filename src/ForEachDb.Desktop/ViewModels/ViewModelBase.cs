@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ForEachDb.Console.ViewModels;
+namespace ForEachDb.Desktop.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject;

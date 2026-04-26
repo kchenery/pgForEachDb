@@ -10,10 +10,7 @@ public class RunSessionTests
         Port: 5432,
         Database: "postgres",
         Username: "admin",
-        Password: "pw",
-        IncludePostgresDb: false,
-        IncludeTemplateDb: false,
-        IgnoreDatabases: Array.Empty<string>());
+        Password: "pw");
 
     [Test]
     public void Construction_SetsInitialStateToIdle()

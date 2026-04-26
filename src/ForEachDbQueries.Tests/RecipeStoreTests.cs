@@ -106,10 +106,7 @@ public class RecipeStoreTests
             Port: 5432,
             Database: "postgres",
             Username: "admin",
-            Password: string.Empty,
-            IncludePostgresDb: false,
-            IncludeTemplateDb: false,
-            IgnoreDatabases: new[] { "_old" }),
+            Password: string.Empty),
         SelectedDatabases: new[] { "app", "billing" },
         Query: "ANALYZE;",
         Threads: 4);

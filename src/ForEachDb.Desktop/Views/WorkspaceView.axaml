@@ -1,0 +1,289 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ForEachDb.Desktop.ViewModels"
+             xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:b="clr-namespace:ForEachDb.Desktop.Behaviors"
+             x:Class="ForEachDb.Desktop.Views.WorkspaceView"
+             x:DataType="vm:WorkspaceViewModel">
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- Top app bar -->
+    <Border Grid.Row="0"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="20,14">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Image Source="avares://ForEachDb.Desktop/Assets/logo-64.png" Width="26" Height="26" />
+          <TextBlock Text="pgForEachDb" FontWeight="600" FontSize="15" VerticalAlignment="Center" />
+          <Rectangle Width="1" Height="18" Fill="{DynamicResource BorderBrush}" Margin="6,0" />
+          <TextBlock Classes="mono muted" FontSize="12" VerticalAlignment="Center">
+            <Run Text="{Binding Username, Mode=OneWay}" />
+            <Run Text="@" />
+            <Run Text="{Binding Host, Mode=OneWay}" />
+          </TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <Button Content="Load recipe…" Command="{Binding LoadRecipeFromFileCommand}" Classes="ghost" />
+          <Button Content="Save recipe"  Command="{Binding BeginSaveRecipeCommand}" Classes="ghost" />
+          <Button Content="Export CSV"   Command="{Binding ExportCsvCommand}"       Classes="ghost" />
+          <Button Content="Disconnect"   Command="{Binding DisconnectCommand}"      Classes="ghost" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Body -->
+    <Grid Grid.Row="1" Margin="16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280" MinWidth="220" />
+        <ColumnDefinition Width="6" />
+        <ColumnDefinition Width="*" MinWidth="420" />
+      </Grid.ColumnDefinitions>
+
+      <GridSplitter Grid.Column="1" ResizeDirection="Columns" Width="6" />
+
+      <!-- Sidebar: database list -->
+      <Border Grid.Column="0" Classes="card" Padding="0">
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+          <!-- Sidebar header -->
+          <Grid Grid.Row="0" Margin="12,10,12,6" ColumnDefinitions="*,Auto">
+            <TextBlock Text="DATABASES" Classes="label" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding SelectionSummary}"
+                       Classes="muted" FontSize="11" VerticalAlignment="Center" />
+          </Grid>
+
+          <!-- Search + template toggle -->
+          <Grid Grid.Row="1" Margin="12,0,12,8" ColumnDefinitions="*,Auto" ColumnSpacing="6">
+            <TextBox Grid.Column="0"
+                     Text="{Binding DatabaseSearch, Mode=TwoWay}"
+                     PlaceholderText="Filter (e.g. app_*)…" />
+            <ToggleButton Grid.Column="1"
+                          Classes="segment"
+                          Content="Templates"
+                          IsChecked="{Binding ShowTemplates, Mode=TwoWay}" />
+          </Grid>
+
+          <ListBox Grid.Row="2"
+                   x:Name="DatabaseList"
+                   ItemsSource="{Binding Databases}"
+                   SelectionMode="Single"
+                   KeyDown="OnDatabaseListKeyDown"
+                   Margin="4,0,4,0">
+            <ListBox.Resources>
+              <x:Double x:Key="CheckBoxSize">16</x:Double>
+            </ListBox.Resources>
+            <ListBox.Styles>
+              <Style Selector="ListBoxItem" x:DataType="vm:DatabaseItem">
+                <Setter Property="IsVisible" Value="{Binding IsVisible}" />
+              </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:DatabaseItem">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                  <CheckBox Grid.Column="0"
+                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                            VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1"
+                             Text="{Binding Name}"
+                             VerticalAlignment="Center"
+                             TextTrimming="CharacterEllipsis"
+                             FontSize="13" />
+                  <StackPanel Grid.Column="2"
+                              Orientation="Horizontal" Spacing="6"
+                              VerticalAlignment="Center"
+                              IsVisible="{Binding HasStatus}">
+                    <Ellipse Classes="dot"
+                             Classes.running="{Binding IsRunning}"
+                             Classes.success="{Binding IsSucceeded}"
+                             Classes.error="{Binding IsFailed}"
+                             Classes.cancelled="{Binding IsCancelled}" />
+                    <TextBlock Classes="state"
+                               Classes.running="{Binding IsRunning}"
+                               Classes.success="{Binding IsSucceeded}"
+                               Classes.error="{Binding IsFailed}"
+                               Classes.cancelled="{Binding IsCancelled}"
+                               Text="{Binding BadgeText}" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+
+          <!-- Sidebar footer -->
+          <Border Grid.Row="3" Padding="10,8"
+                  BorderBrush="{DynamicResource BorderBrush}"
+                  BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+              <Button Grid.Column="0" Content="All"  Command="{Binding SelectAllCommand}"  Classes="ghost" Padding="8,4" />
+              <Button Grid.Column="1" Content="None" Command="{Binding SelectNoneCommand}" Classes="ghost" Padding="8,4" Margin="2,0,0,0" />
+              <TextBlock Grid.Column="3" Text="Threads"
+                         Classes="muted" VerticalAlignment="Center" FontSize="12" Margin="0,0,6,0" />
+              <NumericUpDown Grid.Column="4"
+                             Value="{Binding Threads, Mode=TwoWay}"
+                             Minimum="{x:Static vm:WorkspaceDefaults.MinThreadsDecimal}"
+                             Maximum="{x:Static vm:WorkspaceDefaults.MaxThreadsDecimal}"
+                             Increment="1"
+                             FormatString="0"
+                             Width="110"
+                             HorizontalContentAlignment="Center"
+                             VerticalContentAlignment="Center" />
+            </Grid>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- Main pane: Query / Results / Log -->
+      <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto">
+
+        <!-- Tab row -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+          <Border Classes="segmentGroup">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <ToggleButton Classes="segment" Content="Query"
+                            IsChecked="{Binding IsShowingQuery, Mode=OneWay}"
+                            Command="{Binding ShowQueryCommand}" />
+              <ToggleButton Classes="segment" Content="Results"
+                            IsChecked="{Binding IsShowingResults, Mode=OneWay}"
+                            Command="{Binding ShowResultsCommand}" />
+              <ToggleButton Classes="segment" Content="Log"
+                            IsChecked="{Binding IsShowingLog, Mode=OneWay}"
+                            Command="{Binding ShowLogCommand}" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock Grid.Column="1" Text="{Binding RunStatus}" Classes="muted"
+                     VerticalAlignment="Center" HorizontalAlignment="Center" />
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <Button Content="Cancel" Command="{Binding CancelCommand}" Classes="ghost" />
+            <Button Content="Run"    Command="{Binding RunCommand}"    Classes="accent" IsDefault="True" />
+          </StackPanel>
+        </Grid>
+
+        <!-- Query pane -->
+        <Border Grid.Row="1" Classes="card" Padding="0" IsVisible="{Binding IsShowingQuery}">
+          <ae:TextEditor x:Name="QueryEditor"
+                         ShowLineNumbers="True"
+                         FontFamily="Cascadia Mono,Consolas,Menlo,Monospace"
+                         FontSize="13"
+                         Padding="8"
+                         b:TextEditorBindings.BoundText="{Binding Query, Mode=TwoWay}" />
+        </Border>
+
+        <!-- Results pane -->
+        <Border Grid.Row="1" Classes="card" Padding="0" IsVisible="{Binding IsShowingResults}">
+          <Panel>
+            <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        IsVisible="{Binding !Results.Count}">
+              <TextBlock Text="No results yet" Classes="h2" HorizontalAlignment="Center" />
+              <TextBlock Text="Run a query with Ctrl+Enter to see rows here." Classes="muted" HorizontalAlignment="Center" />
+            </StackPanel>
+            <DataGrid ItemsSource="{Binding Results}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      CanUserResizeColumns="True"
+                      CanUserReorderColumns="True"
+                      CanUserSortColumns="True"
+                      x:Name="ResultsGrid" />
+          </Panel>
+        </Border>
+
+        <!-- Log pane -->
+        <Border Grid.Row="1" Classes="card" Padding="0" IsVisible="{Binding IsShowingLog}">
+          <Panel>
+            <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        IsVisible="{Binding !Logs.Count}">
+              <TextBlock Text="No log output" Classes="h2" HorizontalAlignment="Center" />
+              <TextBlock Text="NOTICE, WARNING, ERROR messages from your query will appear here." Classes="muted" HorizontalAlignment="Center" />
+            </StackPanel>
+            <ListBox x:Name="LogList"
+                     ItemsSource="{Binding Logs}"
+                     Padding="12">
+              <ListBox.Styles>
+                <Style Selector="ListBoxItem" x:DataType="vm:LogRow">
+                  <Setter Property="IsVisible" Value="{Binding IsVisible}" />
+                </Style>
+              </ListBox.Styles>
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LogRow">
+                  <Grid ColumnDefinitions="70,180,70,*" ColumnSpacing="12">
+                    <TextBlock Grid.Column="0" Classes="mono muted" Text="{Binding Timestamp}" FontSize="12" />
+                    <TextBlock Grid.Column="1" Classes="mono" Text="{Binding Database}" FontSize="12" />
+                    <TextBlock Grid.Column="2"
+                               Classes="mono loglevel"
+                               Classes.info="{Binding IsInfo}"
+                               Classes.notice="{Binding IsNotice}"
+                               Classes.warning="{Binding IsWarning}"
+                               Classes.error="{Binding IsError}"
+                               Text="{Binding Level}" FontSize="12" />
+                    <TextBlock Grid.Column="3" Classes="mono" Text="{Binding Message}" FontSize="12" TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Panel>
+        </Border>
+
+        <!-- Footer -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="10"
+                      IsVisible="{Binding IsShowingResults}">
+            <TextBlock Text="Filter by database" Classes="muted" VerticalAlignment="Center" FontSize="12" />
+            <ComboBox ItemsSource="{Binding ResultsFilter.Values}"
+                      SelectedItem="{Binding ResultsFilter.Selected, Mode=TwoWay}"
+                      MinWidth="260" />
+            <TextBlock VerticalAlignment="Center" Classes="muted" FontSize="12"
+                       Text="{Binding Results.Count, StringFormat={}{0} rows}" />
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="10"
+                      IsVisible="{Binding IsShowingLog}">
+            <TextBlock Text="Filter by database" Classes="muted" VerticalAlignment="Center" FontSize="12" />
+            <ComboBox ItemsSource="{Binding LogsFilter.Values}"
+                      SelectedItem="{Binding LogsFilter.Selected, Mode=TwoWay}"
+                      MinWidth="220" />
+            <Button Content="Save log…" Command="{Binding ExportLogCommand}" Classes="ghost" />
+            <Button Content="Clear log" Command="{Binding ClearLogCommand}" Classes="ghost" />
+            <TextBlock VerticalAlignment="Center" Classes="muted" FontSize="12"
+                       Text="{Binding Logs.Count, StringFormat={}{0} entries}" />
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <!-- Save recipe modal -->
+    <Border Grid.Row="0" Grid.RowSpan="2"
+            IsVisible="{Binding IsSavingRecipe}"
+            Background="#CC000000">
+      <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+              Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="1" CornerRadius="{DynamicResource CardRadius}"
+              Padding="24" Width="420">
+        <StackPanel Spacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Save recipe" Classes="h2" />
+            <TextBlock Text="Save the current connection, database selection, query, and threads as a reusable recipe."
+                       Classes="muted" FontSize="12" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Name" Classes="muted" FontSize="12" />
+            <TextBox Text="{Binding SaveRecipeName, Mode=TwoWay}" PlaceholderText="e.g. prod-analytics" />
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Button Grid.Column="0" Content="Save to file…" Command="{Binding SaveRecipeToFileCommand}" />
+            <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelSaveRecipeCommand}" IsCancel="True" />
+            <Button Grid.Column="3" Content="Save"   Command="{Binding ConfirmSaveRecipeCommand}"
+                    IsDefault="True" Classes="accent" Margin="10,0,0,0" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

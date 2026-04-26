@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pgForEachDb — a database cylinder wrapped by a 3/4 circular "for each"
+  loop arrow, rendered in the app's accent purple. Drawn at a 32×32
+  viewport so it scales cleanly from the 22 px toolbar mark to a 256 px
+  app icon.
+-->
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+     fill="none" stroke="#7C6AF5" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- Database cylinder, centered -->
+  <ellipse cx="16" cy="11" rx="6" ry="2" />
+  <path d="M 10 11 V 21 A 6 2 0 0 0 22 21 V 11" />
+  <path d="M 10 15 A 6 2 0 0 0 22 15" />
+  <path d="M 10 18 A 6 2 0 0 0 22 18" />
+
+  <!-- 3/4 loop arrow with a triangular arrowhead at the end -->
+  <path d="M 24.5 7.5 A 12 12 0 1 1 7.5 7.5" />
+  <path d="M 7 10 L 7.5 7.5 L 5 8" />
+</svg>

@@ -1,24 +1,37 @@
 using System.Collections.Specialized;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using ForEachDb.Console.ViewModels;
+using AvaloniaEdit;
+using AvaloniaEdit.TextMate;
+using ForEachDb.Desktop.ViewModels;
+using TextMateSharp.Grammars;
 
-namespace ForEachDb.Console.Views;
+namespace ForEachDb.Desktop.Views;
 
 public partial class WorkspaceView : UserControl
 {
     private DataGrid? _grid;
+    private TextEditor? _editor;
+    private TextMate.Installation? _textMate;
     private WorkspaceViewModel? _vm;
 
     public WorkspaceView()
     {
         InitializeComponent();
         _grid = this.FindControl<DataGrid>("ResultsGrid");
+        _editor = this.FindControl<TextEditor>("QueryEditor");
+
+        if (_editor is not null)
+        {
+            var registry = new RegistryOptions(ThemeName.DarkPlus);
+            _textMate = _editor.InstallTextMate(registry);
+            var sql = registry.GetLanguageByExtension(".sql");
+            if (sql is not null)
+                _textMate.SetGrammar(registry.GetScopeByLanguageId(sql.Id));
+        }
+
         DataContextChanged += OnDataContextChanged;
         KeyDown += OnKeyDown;
     }
@@ -71,51 +84,20 @@ public partial class WorkspaceView : UserControl
             return;
         }
 
-        if (e.Key == Key.Q && (e.KeyModifiers & KeyModifiers.Control) != 0)
-        {
-            _vm?.Quit();
-            e.Handled = true;
-            return;
-        }
-
         if (e.Key == Key.F2 && _vm is not null)
         {
             _vm.ToggleViewCommand.Execute(null);
             e.Handled = true;
-            return;
         }
-
-        if ((e.KeyModifiers & KeyModifiers.Alt) != 0 && e.Key is Key.Left or Key.Right)
-        {
-            var grid = this.FindControl<Grid>("BodyGrid");
-            if (grid is { ColumnDefinitions.Count: > 0 })
-            {
-                var column = grid.ColumnDefinitions[0];
-                var delta = e.Key == Key.Left ? -2 : 2;
-                var current = column.Width.IsAbsolute ? column.Width.Value : 28;
-                var min = column.MinWidth > 0 ? column.MinWidth : 8;
-                var next = Math.Max(min, current + delta);
-                column.Width = new GridLength(next, GridUnitType.Pixel);
-                e.Handled = true;
-            }
-        }
-    }
-
-    private void OnDatabaseActivated(object? sender, TappedEventArgs e)
-    {
-        if (sender is ListBox { SelectedItem: DatabaseItem item })
-            item.Toggle();
     }
 
     private void OnDatabaseListKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Space or Key.Enter &&
+        if (e.Key is Key.Space &&
             sender is ListBox { SelectedItem: DatabaseItem item })
         {
-            item.Toggle();
+            item.IsSelected = !item.IsSelected;
             e.Handled = true;
         }
     }
-
-    private void OnQuit(object? sender, RoutedEventArgs e) => _vm?.Quit();
 }

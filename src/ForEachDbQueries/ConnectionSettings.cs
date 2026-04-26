@@ -5,7 +5,4 @@ public sealed record ConnectionSettings(
     int Port,
     string Database,
     string Username,
-    string Password,
-    bool IncludePostgresDb,
-    bool IncludeTemplateDb,
-    IReadOnlyList<string> IgnoreDatabases);
+    string Password);

@@ -8,7 +8,7 @@ using Spectre.Console;
 // Launch the Consolonia TUI when invoked with no arguments or --tui.
 if (args.Length == 0 || args.Any(a => string.Equals(a, "--tui", StringComparison.OrdinalIgnoreCase)))
 {
-    ForEachDb.Console.Program.Run(args);
+    ForEachDb.Desktop.Program.Run(args);
     return;
 }
 
@@ -37,7 +37,7 @@ Parser.Default.ParseArguments<Options>(args)
         }
 
         // Handle required fields
-        options.Password ??= ReadLine.ReadPassword("Password: ");
+        options.Password ??= AnsiConsole.Prompt(new TextPrompt<string>("Password:").Secret());
 
         if (options.Query is not null) query = options.Query;
         if (options.IgnoreDatabases is not null) dbFinder.IgnoreDatabases(options.IgnoreDatabases);
