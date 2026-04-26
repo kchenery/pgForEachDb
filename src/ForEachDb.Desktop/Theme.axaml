@@ -1,0 +1,316 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+
+      <!-- Palette -->
+      <Color x:Key="BgColor">#0B0D12</Color>
+      <Color x:Key="SurfaceColor">#151822</Color>
+      <Color x:Key="SurfaceElevatedColor">#1C2130</Color>
+      <Color x:Key="BorderColor">#262B38</Color>
+      <Color x:Key="BorderStrongColor">#343B4A</Color>
+      <Color x:Key="MutedColor">#7A8296</Color>
+      <Color x:Key="TextColor">#DADFE9</Color>
+      <Color x:Key="TextBrightColor">#F4F6FB</Color>
+      <Color x:Key="AccentColor">#7C6AF5</Color>
+      <Color x:Key="AccentHoverColor">#8D7DFF</Color>
+      <Color x:Key="AccentPressedColor">#6B57E6</Color>
+      <Color x:Key="SuccessColor">#34D399</Color>
+      <Color x:Key="WarningColor">#FBBF24</Color>
+      <Color x:Key="ErrorColor">#F87171</Color>
+      <Color x:Key="CodeBgColor">#0E1118</Color>
+
+      <SolidColorBrush x:Key="BgBrush"              Color="{StaticResource BgColor}" />
+      <SolidColorBrush x:Key="SurfaceBrush"         Color="{StaticResource SurfaceColor}" />
+      <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevatedColor}" />
+      <SolidColorBrush x:Key="BorderBrush"          Color="{StaticResource BorderColor}" />
+      <SolidColorBrush x:Key="BorderStrongBrush"    Color="{StaticResource BorderStrongColor}" />
+      <SolidColorBrush x:Key="MutedBrush"           Color="{StaticResource MutedColor}" />
+      <SolidColorBrush x:Key="TextBrush"            Color="{StaticResource TextColor}" />
+      <SolidColorBrush x:Key="TextBrightBrush"      Color="{StaticResource TextBrightColor}" />
+      <SolidColorBrush x:Key="AccentBrush"          Color="{StaticResource AccentColor}" />
+      <SolidColorBrush x:Key="AccentHoverBrush"     Color="{StaticResource AccentHoverColor}" />
+      <SolidColorBrush x:Key="AccentPressedBrush"   Color="{StaticResource AccentPressedColor}" />
+      <SolidColorBrush x:Key="SuccessBrush"         Color="{StaticResource SuccessColor}" />
+      <SolidColorBrush x:Key="WarningBrush"         Color="{StaticResource WarningColor}" />
+      <SolidColorBrush x:Key="ErrorBrush"           Color="{StaticResource ErrorColor}" />
+      <SolidColorBrush x:Key="CodeBgBrush"          Color="{StaticResource CodeBgColor}" />
+
+      <!-- Fluent accent override (Color-typed key, not a brush) -->
+      <Color x:Key="SystemAccentColor">#7C6AF5</Color>
+
+      <CornerRadius x:Key="CardRadius">10</CornerRadius>
+      <CornerRadius x:Key="ButtonRadius">8</CornerRadius>
+      <CornerRadius x:Key="PillRadius">999</CornerRadius>
+
+      <x:Double x:Key="ControlContentThemeFontSize">13</x:Double>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Window background -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource BgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="FontFamily" Value="Inter, -apple-system, 'Segoe UI', sans-serif" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <!-- Default button — subtle, not shouting -->
+  <Style Selector="Button">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ButtonRadius}" />
+    <Setter Property="Padding" Value="14,7" />
+    <Setter Property="FontWeight" Value="500" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.12" />
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.12" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#232838" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongColor}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="Button:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1A1F2C" />
+  </Style>
+  <Style Selector="Button:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+  </Style>
+
+  <!-- Accent button — primary action -->
+  <Style Selector="Button.accent">
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentPressedBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <!-- Ghost button — toolbar style -->
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+  </Style>
+  <Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+
+  <!-- Pill / segmented toggles -->
+  <Style Selector="ToggleButton.segment">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="14,6" />
+    <Setter Property="FontWeight" Value="500" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.12" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="ToggleButton.segment:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1F2432" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+  <Style Selector="ToggleButton.segment:checked /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="Border.segmentGroup">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="3" />
+  </Style>
+
+  <!-- Card — generic framed container -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CardRadius}" />
+  </Style>
+
+  <!-- Typography classes -->
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="28" />
+    <Setter Property="FontWeight" Value="600" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="600" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="700" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+  </Style>
+  <Style Selector="TextBlock.mono">
+    <Setter Property="FontFamily" Value="JetBrains Mono, Menlo, Consolas, Monaco, monospace" />
+  </Style>
+
+  <!-- TextBox default -->
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="10,7" />
+    <Setter Property="MinHeight" Value="32" />
+  </Style>
+
+  <!-- SQL editor style -->
+  <Style Selector="TextBox.code">
+    <Setter Property="Background" Value="{DynamicResource CodeBgBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="FontFamily" Value="JetBrains Mono, Menlo, Consolas, Monaco, monospace" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="CornerRadius" Value="{DynamicResource CardRadius}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="SelectionBrush" Value="#3D2E8B" />
+  </Style>
+
+  <!-- CheckBox -->
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+
+  <!-- ComboBox -->
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="10,0" />
+  </Style>
+
+  <!-- NumericUpDown -->
+  <Style Selector="NumericUpDown">
+    <Setter Property="MinHeight" Value="32" />
+  </Style>
+
+  <!-- ListBox items — subtle hover, accent-selected -->
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="2" />
+  </Style>
+  <Style Selector="ListBoxItem">
+    <Setter Property="Padding" Value="8,3" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="CornerRadius" Value="5" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Margin" Value="0,0" />
+  </Style>
+  <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="#2A2346" />
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextBrightBrush}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+    <Setter Property="Background" Value="#332A54" />
+  </Style>
+
+  <!-- Status dot + label -->
+  <Style Selector="Ellipse.dot">
+    <Setter Property="Width" Value="7" />
+    <Setter Property="Height" Value="7" />
+  </Style>
+  <Style Selector="Ellipse.dot.running">   <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />  </Style>
+  <Style Selector="Ellipse.dot.success">   <Setter Property="Fill" Value="{DynamicResource SuccessBrush}" /> </Style>
+  <Style Selector="Ellipse.dot.error">     <Setter Property="Fill" Value="{DynamicResource ErrorBrush}" />   </Style>
+  <Style Selector="Ellipse.dot.cancelled"> <Setter Property="Fill" Value="{DynamicResource WarningBrush}" /> </Style>
+
+  <Style Selector="TextBlock.state">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="500" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.state.running">   <Setter Property="Foreground" Value="#B5A8FF" /> </Style>
+  <Style Selector="TextBlock.state.success">   <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" /> </Style>
+  <Style Selector="TextBlock.state.error">     <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />   </Style>
+  <Style Selector="TextBlock.state.cancelled"> <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" /> </Style>
+
+  <!-- Log level pill -->
+  <Style Selector="TextBlock.loglevel">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="600" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+  </Style>
+  <Style Selector="TextBlock.loglevel.info">    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />   </Style>
+  <Style Selector="TextBlock.loglevel.notice">  <Setter Property="Foreground" Value="#7DB7FF" />                         </Style>
+  <Style Selector="TextBlock.loglevel.warning"> <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" /> </Style>
+  <Style Selector="TextBlock.loglevel.error">   <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />   </Style>
+
+  <!-- Scrollbar — slim -->
+  <Style Selector="ScrollBar">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <!-- DataGrid -->
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="RowBackground" Value="Transparent" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+    <Setter Property="BorderThickness" Value="0,0,1,1" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="600" />
+    <Setter Property="Padding" Value="12,8" />
+  </Style>
+  <Style Selector="DataGridRow">
+    <Setter Property="MinHeight" Value="30" />
+  </Style>
+  <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="#1A1F2C" />
+  </Style>
+  <Style Selector="DataGridCell">
+    <Setter Property="Padding" Value="12,4" />
+  </Style>
+
+  <!-- GridSplitter -->
+  <Style Selector="GridSplitter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="GridSplitter:pointerover">
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+</Styles>

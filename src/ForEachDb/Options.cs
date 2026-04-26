@@ -10,7 +10,7 @@ public class Options
     [Option('q', "query", HelpText = "Query to run against each database")]
     public string? Query { get; set; }
 
-    [Option('i', "interactive", HelpText = "Interactive mode: select databases and enter queries interactively")]
+    [Option('i', "interactive", HelpText = "[Deprecated] Old minimal loop. Launch with no args (or --tui) for the full Spectre.Console interactive mode instead.")]
     public bool Interactive { get; set; }
     
     [Option('h', "host", HelpText = "Hostname to connect to.", Default = "localhost")]

@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.1.72" />
-      <PackageReference Include="Dapper.SqlBuilder" Version="2.1.66" />
-      <PackageReference Include="Npgsql" Version="10.0.2" />
+      <PackageReference Include="Dapper" Version="*" />
+      <PackageReference Include="Dapper.SqlBuilder" Version="*" />
+      <PackageReference Include="Npgsql" Version="*" />
     </ItemGroup>
 
 </Project>

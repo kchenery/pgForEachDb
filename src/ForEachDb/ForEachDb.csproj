@@ -9,21 +9,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.1" />
-      <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-      <PackageReference Include="Spectre.Console" Version="0.55.2" />
-      <PackageReference Include="Npgsql" Version="10.0.2" />
-      <PackageReference Include="ReadLine" Version="2.0.1" />
+      <PackageReference Include="CommandLineParser" Version="*" />
+      <PackageReference Include="JetBrains.Annotations" Version="*" />
+      <PackageReference Include="Spectre.Console" Version="*" />
+      <PackageReference Include="Npgsql" Version="*" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ForEachDbQueries\ForEachDbQueries.csproj" />
+      <ProjectReference Include="..\ForEachDb.Desktop\ForEachDb.Desktop.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="JetBrains.Annotations">
-        <HintPath>..\..\..\..\.nuget\packages\jetbrains.annotations\2022.3.1\lib\netstandard2.0\JetBrains.Annotations.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 
 </Project>
