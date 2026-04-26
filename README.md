@@ -2,92 +2,73 @@
 
 Run a SQL statement across multiple PostgreSQL databases on a server in parallel. Useful for maintenance commands like `ANALYZE`, `VACUUM`, or any query you need to execute against every database.
 
-Features a live progress display showing which databases are running, which have completed, and which failed.
+Two ways to drive it:
 
-## Interactive mode
+- **Desktop app** — an Avalonia GUI for ad-hoc work and exploration.
+- **CLI** — for scripts and pipelines.
 
-Launching with no arguments (or `--tui`) opens a Spectre.Console interactive wizard: connect, pick databases, enter SQL, watch a live two-panel display as it runs, see a results summary, then a menu for what's next.
+## Desktop app
+
+Launching with no arguments opens the Avalonia desktop app.
 
 ```bash
-./ForEachDb          # launches the interactive flow
-./ForEachDb --tui    # same thing
+./ForEachDb        # opens the desktop app
+./ForEachDb --tui  # same thing
 ```
 
-### Flow
+The app has two screens:
 
-1. **Connect** — prompts for host/port/user/password/filters, or pick a saved recipe.
-2. **Select databases** — multi-select prompt (space to toggle, enter to confirm).
-3. **Enter SQL** — single-line terminated by `;`, or multi-line terminated by `;;` on its own line. Empty input returns to the menu.
-4. **Live run** — two-panel display: database states on the left with animated spinners, log stream (NOTICE / INFO / ERROR) on the right. `Ctrl+C` cancels.
-5. **Results** — if the query returned rows, a table summary prints (capped at 50 rows for display; CSV export writes everything).
-6. **Menu** — re-run same query · new query · change selection · change threads · save recipe · export CSV · change cluster · quit.
+1. **Connection** — host / port / user / password, plus the list of saved *recipes*. Double-click a recipe to populate the form; you still re-enter the password.
+2. **Workspace** — three panes (Query, Results, Log) and a sidebar with the database list:
+   - **Database list** — every non-template database is selected by default. A search box filters by glob (`b*`, `*_log`, `app_?`) or substring; toggle **Templates** to include `template0` / `template1` / etc. Selection survives filter changes; **All** / **None** apply to whatever is visible.
+   - **Query** — AvaloniaEdit with PostgreSQL syntax highlighting. `Ctrl+Enter` runs, `F2` cycles panes.
+   - **Results** — a sortable, filterable grid (filter by source database). **Export CSV** dumps the active filter.
+   - **Log** — `NOTICE` / `INFO` / `WARNING` / `ERROR` rows from each database, colour-coded by level, also filterable by database. **Save log…** writes a tab-separated file.
+   - **Save recipe** — bundles current connection (no password), database selection, query, and thread count under a name. Save into the user config or to a chosen file.
 
-### Recipes
+Recipes live at `$XDG_CONFIG_HOME/pgForEachDb/recipes.json` (Unix; defaults to `~/.config/pgForEachDb/recipes.json`) or `%APPDATA%\pgForEachDb\recipes.json` (Windows).
 
-A *recipe* bundles a connection (host / port / user / db / filters), a database selection, a query, and a thread count under a name. Recipes never store passwords — you always re-enter on load.
+## CLI
 
-- **Save** — choose "Save current as recipe" from the menu after any run.
-- **Load** — at the connection step, choose "Load recipe" instead of entering details.
-
-Recipes live at `$XDG_CONFIG_HOME/pgForEachDb/recipes.json` (Unix, defaulting to `~/.config/pgForEachDb/recipes.json`) or `%APPDATA%\pgForEachDb\recipes.json` (Windows).
-
-## CLI usage
+For scripted use, pass `-q` (or `--interactive` for a Spectre.Console prompt loop in the terminal):
 
 ```
 ./ForEachDb --help
 
   -q, --query              Query to run against each database
-  -i, --interactive        [Deprecated] Old minimal loop. Launch with no args for the richer wizard.
+  -i, --interactive        Spectre.Console prompt loop in the terminal
   -h, --host               (Default: localhost) Hostname to connect to
-  -d, --database           (Default: postgres) Database to connect to
+  -d, --database           (Default: postgres) Maintenance database to connect to
   -u, --username           (Default: postgres) Username for the connection
-  -p, --password           Password for the connection
-  -t, --threads            (Default: 4) Number of threads to run
-  --port                   (Default: 5432) Port for the connection
-  --ignore                 List of databases that should be ignored. E.g: --ignore foo bar baz
-  --include-postgres-db    Flag to include the postgres database
-  --include-template-db    Flag to include template databases
-  --help                   Display this help screen
-  --version                Display version information
+  -p, --password           Password for the connection (prompted if omitted)
+  -t, --threads            (Default: 4) Number of parallel threads
+      --port               (Default: 5432) Port for the connection
+      --ignore             Databases to skip. e.g. --ignore foo bar baz
+      --include-postgres-db    Include the postgres database (off by default)
+      --include-template-db    Include template databases (off by default)
+      --help               Display this help screen
+      --version            Display version information
 ```
 
-## Examples
-
-### Run ANALYZE across all databases
+### Examples
 
 ```bash
+# Run ANALYZE across every database
 ./ForEachDb -q "ANALYZE;" -h localhost -u postgres
-```
 
-### Run VACUUM on all databases with 8 parallel threads
-
-```bash
+# VACUUM with 8 parallel threads
 ./ForEachDb -q "VACUUM;" -h localhost -u postgres -t 8
-```
 
-### Ignore specific databases
-
-```bash
+# Skip a couple of databases
 ./ForEachDb -q "ANALYZE;" -h localhost -u postgres --ignore staging_old test_db
-```
 
-### Interactive mode
-
-Launch interactive mode to pick which databases to target and enter queries on the fly:
-
-```bash
+# Interactive prompt loop in the terminal
 ./ForEachDb -i -h localhost -u postgres
 ```
 
-In interactive mode you can:
-- Select databases from a multi-select list (space to toggle, enter to confirm)
-- Enter a SQL query at the `SQL>` prompt
-- Type `\r` to go back and reselect databases (previous selections are retained)
-- Press enter with no input to exit
+In interactive (`-i`) mode you pick databases from a multi-select prompt and enter SQL at a `SQL>` prompt; type `\r` to reselect databases, empty input exits.
 
-### Progress display
-
-Queries run in parallel with a live progress display:
+### Progress output (CLI)
 
 ```
 ✔ customer_db
@@ -100,20 +81,25 @@ Queries run in parallel with a live progress display:
 3 / 5 databases completed
 ```
 
-- Green checkmark for successful completions
-- Red cross for failures with the error message
-- Animated spinner for databases currently running
+Green check = success, red cross = failure with error, animated spinner = running.
 
-## Building
+## Building and testing
 
 ```bash
 dotnet build
-```
-
-## Testing
-
-```bash
 dotnet test
 ```
 
-Integration tests use [Testcontainers](https://dotnet.testcontainers.org/) and require Docker to be running.
+Integration tests under `ForEachDbQueries.Tests` use [Testcontainers](https://dotnet.testcontainers.org/) and require Docker. The `ForEachDb.Desktop.Tests` project is pure unit tests with no Docker dependency.
+
+## Project layout
+
+| Folder    | Project                  | Purpose                                          |
+|-----------|--------------------------|--------------------------------------------------|
+| `App`     | `ForEachDb.Desktop`      | Avalonia 12 GUI                                  |
+| `Library` | `ForEachDbQueries`       | Domain library: runner, recipes, exporters       |
+| `CLI`     | `ForEachDb`              | Command-line / Spectre interactive entry point   |
+| `Tests`   | `ForEachDb.Desktop.Tests`| Unit tests for the desktop view-models           |
+| `Tests`   | `ForEachDbQueries.Tests` | Integration tests for the domain library         |
+
+See [`docs/architecture-review.md`](docs/architecture-review.md) for the maintainability log and current open items.
